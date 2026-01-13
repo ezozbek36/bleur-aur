@@ -1,0 +1,13 @@
+diff --git a/Cargo.toml b/Cargo.toml
+index 1d73e37..7c11ba0 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -14,7 +14,7 @@ owo-colors = { version = "4.2.2", default-features = false, features = [
+   "supports-colors",
+ ] }
+ clap = { version = "4.5.40", features = ["derive", "color", "std"] }
+-reqwest = { version = "0.13", features = ["stream", "blocking", "rustls"] }
++reqwest = { version = "0.13", default-features = false, features = ["stream", "blocking", "native-tls", "charset"] }
+ serde = { version = "1.0.219", features = ["derive"] }
+ tempfile = "3.20.0"
+ thiserror = "2.0.12"
