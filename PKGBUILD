@@ -7,44 +7,24 @@ arch=('x86_64')
 url="https://github.com/bleur-org/bleur"
 license=('MIT' 'Apache-2.0')
 depends=('libgit2' 'libssh2' 'openssl' 'zstd' 'xz')
-makedepends=('cargo' 'cmake')
+makedepends=('rust' 'cmake')
+options=(!lto)
 source=(
-   "$pkgname-$pkgver.tar.gz::https://github.com/bleur-org/bleur/archive/refs/tags/v$pkgver.tar.gz"
-   "native-tls.patch"
+   "$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz"
 )
-sha256sums=('aa91cc7352c0f185ce9d334ca32d6b3c0647fd3480552af8ca148576be579b09'
-            'ec05107fdcc4585d516d66172f686e2b9f9be2198f6b3ee357632205cab39823')
+sha256sums=('aa91cc7352c0f185ce9d334ca32d6b3c0647fd3480552af8ca148576be579b09')
+
+export RUSTUP_TOOLCHAIN=stable
 
 prepare() {
     cd "$pkgname-$pkgver"
 
-    # Apply the patch to switch from rustls to native-tls (OpenSSL)
-    patch -p1 -i "$srcdir/native-tls.patch"
-
-    export RUSTUP_TOOLCHAIN=stable
-
     # Fetch dependencies ahead of time
-    cargo fetch --target "$CARCH-unknown-linux-gnu"
+    cargo fetch --locked --target "$(rustc --print host-tuple)"
 }
 
 build() {
     cd "$pkgname-$pkgver"
-    export RUSTUP_TOOLCHAIN=stable
-    export CARGO_TARGET_DIR=target
-
-    # Ensure pkg-config can find system libraries
-    export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig"
-    export PKG_CONFIG_ALLOW_SYSTEM_LIBS=1
-    export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
-
-    # FORCE usage of system libraries
-    export LIBSSH2_SYS_USE_PKG_CONFIG=1
-    export ZSTD_SYS_USE_PKG_CONFIG=1
-    export LIBLZMA_SYS_USE_PKG_CONFIG=1
-    export LIBGIT2_NO_VENDOR=1
-
-    # Explicitly add lzma to linker flags
-    export RUSTFLAGS="-C link-arg=-L/usr/lib -C link-arg=-llzma"
 
     # Build release binary
     cargo build --frozen --release --all-features
@@ -53,11 +33,7 @@ build() {
 check() {
     cd "$pkgname-$pkgver"
 
-    export RUSTUP_TOOLCHAIN=stable
-    export CARGO_TARGET_DIR=target
-
-    # Run tests to ensure package integrity
-    cargo test --frozen --all-features
+    cargo test --frozen --release --all-features
 }
 
 package() {
