@@ -1,9 +1,9 @@
 # Maintainer: Ezozbek Rasulov <arch@ezozbek.dev>
 pkgname=bleur
 pkgver=0.0.4
-pkgrel=2
+pkgrel=3
 pkgdesc="That buddy that will get everything ready for you"
-arch=('x86_64')
+arch=('x86_64' 'aarch64' 'armv7h')
 url="https://github.com/bleur-org/bleur"
 license=('MIT' 'Apache-2.0')
 depends=('libgit2' 'libssh2' 'openssl' 'zstd' 'xz')
